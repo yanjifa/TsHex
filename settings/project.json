@@ -5,12 +5,18 @@
       true
     ]
   ],
+
   "design-resolution-height": 1920,
   "design-resolution-width": 1080,
+
   "excluded-modules": [
     "Geom Utils",
     "3D",
     "3D Primitive"
+  ],
+  "group-list": [
+    "default"
+
   ],
   "facebook": {
     "appID": "",
@@ -22,6 +28,8 @@
       "enable": false
     }
   },
+
+  "assets-sort-type": "name"
   "fit-height": true,
   "fit-width": false,
   "group-list": [
