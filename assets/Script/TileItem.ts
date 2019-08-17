@@ -24,6 +24,16 @@ export default class TileItem extends cc.Component {
     // 棋盘与方块重合部分
     private fillTiles: Array<MapItem> = new Array<MapItem>();
 
+    // 当前 Tile 每个方块的坐标
+    private _theList: number[][] = null;
+
+    set theList(theTileList: number[][]) {
+        this._theList = theTileList;
+    }
+
+    get theList() {
+        return this._theList;
+    }
 
     protected onLoad() {
         this.prePos = this.node.getPosition();
@@ -34,6 +44,7 @@ export default class TileItem extends cc.Component {
     private setUpTile() {
         this.node.setPosition(this.prePos);
         const hexData = this.getRandomHex();
+        this.theList = hexData.list;
         const hexPx = hexData.list.map((hexAtrr) => {
             return this.hex2pixel(hexAtrr, this.tileHight);
         });
@@ -98,16 +109,15 @@ export default class TileItem extends cc.Component {
         this.fillTiles = []; // 保存棋盘与方块重合部分。
 
         const distance = 50;
-        const boardFrameList = this.board.boardFrameList;
-        for(const it of boardFrameList) {
+        for(const it of this.board.boardFrameList) {
             // 当前节点被填满直接退出
             if(it.isFill) continue;
-            var flag = true;
+            let flag = true;
 
             for(const child of this.node.children) {
                 const pos = this.node.position.add(child.position);
 
-                if(!it.isFill && it.pos.sub(pos).mag() < distance)
+                if(!it.isFill && it.position.sub(pos).mag() < distance)
                     flag = false, this.fillTiles.push(it);
             }
             // 没有和当前移动元素相交
@@ -130,9 +140,20 @@ export default class TileItem extends cc.Component {
             // 删除当前节点， 重新添加新的节点
             this.node.removeAllChildren();
             this.setUpTile();
+
+            this.board.gainScore();
         } else {
             // 回到之前的位置
             this.node.setPosition(this.prePos);
+
+            for(const it of this.board.boardFrameList) {
+                // 当前节点被填满直接退出
+                if(it.isFill) continue;
+
+                // 没被填到的元素全都清空，防止出现 bug
+                it.color = COLOR.LIGHTGRAY;
+                it.opacity = 255;
+            }
         }
     }
 
