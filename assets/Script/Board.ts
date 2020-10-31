@@ -19,7 +19,7 @@ export default class Board extends cc.Component {
 
     // 整体向上偏移 250
     @property(cc.Integer)
-    private pos_y: number = 250;
+    private posY: number = 250;
 
     @property(cc.Prefab)
     private mapItem: cc.Prefab = null;
@@ -30,9 +30,9 @@ export default class Board extends cc.Component {
     private hashMap: Map<number, MapItem> = new Map<number, MapItem>();
 
     // 存放每个节点
-    private _boardFrameList: Array<MapItem> = new Array<MapItem>();
+    private _boardFrameList: MapItem[] = [];
 
-    set boardFrameList(boardFrameList: Array<MapItem>) {
+    set boardFrameList(boardFrameList: MapItem[]) {
         this._boardFrameList = boardFrameList;
     }
 
@@ -74,7 +74,7 @@ export default class Board extends cc.Component {
         // 棋盘六角网格，坐标系转换像素方法
         const size = h / 2;
         const x = size * Math.sqrt(3) * (hex.q + hex.r / 2);
-        const y = ((size * 3) / 2) * hex.r + this.pos_y;
+        const y = ((size * 3) / 2) * hex.r + this.posY;
         return cc.v2(x, y);
     }
 
@@ -97,8 +97,7 @@ export default class Board extends cc.Component {
             const r2 = Math.min(this.hexSide, -q + this.hexSide);
             for (let r = r1; r <= r2; r++) {
                 const index = this.hex2index(q, r);
-                let tem: MapItem = this.hashMap[index];
-
+                const tem: MapItem = this.hashMap[index];
                 tem.color = COLOR.LIGHTGRAY;
                 tem.opacity = 255;
                 tem.isFill = false;
@@ -109,7 +108,7 @@ export default class Board extends cc.Component {
     public gainScore(){
         let num = 0;
         // 存放要消除的元素
-        let fillTiles: Array<MapItem> = new Array<MapItem>();
+        const fillTiles: MapItem[] = [];
         // 按 q 遍历  左斜线
         for (let q = -this.hexSide; q <= this.hexSide; q++) {
             const r1 = Math.max(-this.hexSide, -q - this.hexSide);
@@ -118,7 +117,7 @@ export default class Board extends cc.Component {
             let flag = true;
             for (let r = r1; r <= r2; r++) {
                 const index = this.hex2index(q, r);
-                let tem: MapItem = this.hashMap[index];
+                const tem: MapItem = this.hashMap[index];
                 if(!tem.isFill) {
                     flag = false;
                     break;
@@ -129,11 +128,11 @@ export default class Board extends cc.Component {
                 num++;
                 for (let r = r1; r <= r2; r++) {
                     const index = this.hex2index(q, r);
-                    let tem: MapItem = this.hashMap[index];
+                    const tem: MapItem = this.hashMap[index];
                     fillTiles.push(tem);
                 }
             }
-            
+
         }
 
         // 按 r 遍历  直线
@@ -144,7 +143,7 @@ export default class Board extends cc.Component {
             let flag = true;
             for (let q = q1; q <= q2; q++) {
                 const index = this.hex2index(q, r);
-                let tem: MapItem = this.hashMap[index];
+                const tem: MapItem = this.hashMap[index];
                 if(!tem.isFill) {
                     flag = false;
                     break;
@@ -155,16 +154,17 @@ export default class Board extends cc.Component {
                 num++;
                 for (let q = q1; q <= q2; q++) {
                     const index = this.hex2index(q, r);
-                    let tem: MapItem = this.hashMap[index];
+                    const tem: MapItem = this.hashMap[index];
                     fillTiles.push(tem);
                 }
             }
-            
+
         }
 
         // 按 q+r 遍历  右斜线
         for (let s = -this.hexSide; s <= this.hexSide; s++) {
-            let q1 = 0, q2 = 0;
+            let q1 = 0;
+            let q2 = 0;
             if(s > 0) {
                 q2 = this.hexSide;
                 q1 = s - q2;
@@ -175,9 +175,9 @@ export default class Board extends cc.Component {
 
             let flag = true;
             for (let q = q1; q <= q2; q++) {
-                let r = s-q;
+                const r = s-q;
                 const index = this.hex2index(q, r);
-                let tem: MapItem = this.hashMap[index];
+                const tem: MapItem = this.hashMap[index];
                 if(!tem.isFill) {
                     flag = false;
                     break;
@@ -187,13 +187,13 @@ export default class Board extends cc.Component {
             if(flag){
                 num++;
                 for (let q = q1; q <= q2; q++) {
-                    let r = s-q;
+                    const r = s-q;
                     const index = this.hex2index(q, r);
-                    let tem: MapItem = this.hashMap[index];
+                    const tem: MapItem = this.hashMap[index];
                     fillTiles.push(tem);
                 }
             }
-            
+
         }
 
         // 恢复原样
@@ -202,7 +202,7 @@ export default class Board extends cc.Component {
             it.color = COLOR.LIGHTGRAY;
         }
 
-        if(num != 0) {
+        if(num !== 0) {
             this.theScore += num * fillTiles.length;
             this.updateScore();
         }
@@ -215,7 +215,7 @@ export default class Board extends cc.Component {
 
         for(const it of this.tileContainer.children){
             const script = it.getComponent('TileItem');
-            let theTileList: number[][] = script.theList;
+            const theTileList: number[][] = script.theList;
 
             let flag = false;
             for (let q = -this.hexSide; q <= this.hexSide; q++) {
@@ -224,20 +224,20 @@ export default class Board extends cc.Component {
 
                 for (let r = r1; r <= r2; r++) {
                     const index = this.hex2index(q, r);
-                    let tem: MapItem = this.hashMap[index];
+                    const tem: MapItem = this.hashMap[index];
                     if(tem.isFill) continue;
 
                     let tileNum = 0;
-                    
+
                     for(const i of theTileList) {
                         const index1 = this.hex2index(q+i[0], r+i[1]);
-                        let tem1: MapItem = this.hashMap[index1];
+                        const tem1: MapItem = this.hashMap[index1];
                         if(tem1 == null || tem1.isFill) break;
                         tileNum++;
                     }
 
                     // 当前剩余位置可以放下当前方块
-                    if(tileNum == theTileList.length) {
+                    if(tileNum === theTileList.length) {
                         flag = true;
                         break;
                     }
@@ -248,9 +248,9 @@ export default class Board extends cc.Component {
             else it.opacity = 255;
 
         }
-        console.log("the:" + num);
+        // console.log("the:" + num);
 
-        if(num == 3){
+        if(num === 3){
             this.gameLose();
         }
     }

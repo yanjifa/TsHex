@@ -13,7 +13,7 @@ export default class TileItem extends cc.Component {
 
     @property(cc.Prefab)
     private blockItem: cc.Prefab = null;
- 
+
     private prePos: cc.Vec2 = null;
 
     private theColor: cc.Color = null;
@@ -22,7 +22,7 @@ export default class TileItem extends cc.Component {
     private board: Board = null;
 
     // 棋盘与方块重合部分
-    private fillTiles: Array<MapItem> = new Array<MapItem>();
+    private fillTiles: MapItem[] = [];
 
     // 当前 Tile 每个方块的坐标
     private _theList: number[][] = null;
@@ -85,10 +85,10 @@ export default class TileItem extends cc.Component {
     }
 
     private addTouchEvent() {
-        this.node.on(cc.Node.EventType.TOUCH_START, (event: cc.Event.EventTouch) => {});
+        // this.node.on(cc.Node.EventType.TOUCH_START, (event: cc.Event.EventTouch) => {});
 
         this.node.on(cc.Node.EventType.TOUCH_MOVE, (event: cc.Event.EventTouch) => {
-            
+
             const delta = event.touch.getDelta();
             this.node.position = this.node.position.add(delta);
             this.checkCollision(event);
@@ -125,7 +125,7 @@ export default class TileItem extends cc.Component {
         }
 
         // 可以放的位置和当前位置相等
-        if(this.fillTiles.length == this.node.children.length){
+        if(this.fillTiles.length === this.node.children.length){
             for(const it of this.fillTiles)
                 it.color = this.theColor, it.opacity = 150;
         }
@@ -133,8 +133,8 @@ export default class TileItem extends cc.Component {
 
     private tileDrop(){
         // 可以放到当前网格中
-        if(this.fillTiles.length == this.node.children.length){
-            for(const it of this.fillTiles) 
+        if(this.fillTiles.length === this.node.children.length){
+            for(const it of this.fillTiles)
                 it.color = this.theColor, it.opacity = 255, it.isFill = true;
 
             // 删除当前节点， 重新添加新的节点
